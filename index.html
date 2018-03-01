@@ -3,7 +3,7 @@
     <head>
         <title>Learning JavaScript</title>
         <link rel="stylesheet" href="style.css">
-        <script src="main.js"></script>
+        <!--<script src="main.js"></script>-->
     </head>
     <body>
         <div class="header">
@@ -11,8 +11,140 @@
             <p>With Brad Traversy</p>
         </div>
         
-        <div class="container">
-
+        <div class="container">            
+            <button id="btnLogin" onclick="login()">SledovaniTV.cz Login</button>
+            <button id="btnPlay" onclick="play()">play</button>
+            <p id="response"></p>                                            
         </div>
+
+        <div class="containerVideo">
+            <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+            <video id="video" controls></video> 
+        </div>
+
+        <script>
+            let videoUrl;                   
+            
+            // {"status":1,"deviceId":1757911392,"password":"vgmbmjxkj2u1jffdnyfd"}            
+            var xhttp = new XMLHttpRequest();               
+            
+            function login(){                                
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {                        
+                        let response = JSON.parse(xhttp.responseText);
+                        document.getElementById("response").innerHTML = response.PHPSESSID;
+                        videoUrl = 'http://sledovanitv.cz/vlc/api-channel/Eurosport.m3u8?PHPSESSID='+ response.PHPSESSID +'&quality=40';   
+                        console.log(videoUrl);                     
+                    }
+                };
+                
+                xhttp.open("GET", "https://sledovanitv.cz/api/device-login?deviceId=1757911392&password=vgmbmjxkj2u1jffdnyfd", true);                                                                                               
+                xhttp.send();                                
+            }
+            
+            function play(){                                    
+                document.getElementById("response").innerHTML = videoUrl;
+                
+                if(Hls.isSupported())
+                {
+                    var video = document.getElementById('video');
+                    var hls = new Hls();
+                    hls.loadSource(videoUrl);
+                    hls.attachMedia(video);
+                    hls.on(Hls.Events.MANIFEST_PARSED,function()
+                    {
+                        video.play();
+                    });
+                }
+                else if (video.canPlayType('application/vnd.apple.mpegurl'))
+                {
+                    video.src = videoUrl;
+                    video.addEventListener('canplay',function()
+                    {
+                        video.play();
+                    });
+                }
+            }
+            
+            /*
+            // Button
+            function changeText(){
+                document.getElementById("btn").innerHTML='You clicked!!!';
+            }
+            
+            function doClick(){
+                alert('You clicked');
+            }
+            */
+            //-------------------------------------------------------------------
+            /*
+            // Object Arrays
+            let users = [
+                {
+                    name: 'John Doe',
+                    age: 35
+                },
+                {
+                    name: 'Mark Smith',
+                    age: 44
+                },
+                {
+                    name: 'Shelly Williams',
+                    age: 25
+                }
+            ];
+
+            console.log(users);
+            */
+            //-------------------------------------------------------------------
+            /*
+            // Constructor pattern
+            function Fruit(name, color, shape){
+                this.name = name;
+                this.color = color;
+                this.shape = shape;
+                this.describe = function(){
+                    return 'A ' + this.name + ' color ' + this.color;
+                }
+            }
+
+            let apple = new Fruit('apple', 'red', 'round');
+            
+            console.log(apple.describe());
+            */
+            //-------------------------------------------------------------------
+            /*
+            // Object constructor 
+            let apple = new Object();
+            apple.color = 'red';
+            apple.shape = 'round';
+            apple.describe = function(){
+                return 'An apple ' + this.color + ' ' + this.shape;
+            }
+
+            console.log(apple.describe());
+            */
+            //-------------------------------------------------------------------
+            /*
+            // Object
+            var person = {
+                firstName:'Brad',
+                lastName:'Traversy',
+                age:34,
+                children:['Brianna', 'Nicholas'],
+                address: {
+                    street:'55 sds',
+                    city:'Boston',
+                    state:'MA'
+                },
+                fullName: function() {
+                    return this.firstName + ' ' + this.lastName;
+                }
+            }
+
+            console.log(person.fullName());
+            */
+            //-------------------------------------------------------------------
+        </script>
     </body>
 </html>

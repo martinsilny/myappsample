@@ -1,0 +1,3 @@
+#EXTM3U
+#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=1200000
+http://195.146.96.208:7909/moderntv/stream/eurosport2/20-hls/live-media.m3u8?_cdn_session=8942328490&_cdn_timestamp=1520349019&_cdn_token=cd3d83349b845a91ac092caf3da8fe2b9f93022d
