@@ -2,149 +2,59 @@
 <html>
     <head>
         <title>Learning JavaScript</title>
-        <link rel="stylesheet" href="style.css">
-        <!--<script src="main.js"></script>-->
+        <link rel="stylesheet" href="style.css">   
+        <link rel="stylesheet" href="//releases.flowplayer.org/7.0.4/commercial/skin/skin.css">
+        <script src="//code.jquery.com/jquery-1.12.4.min.js"></script>
+        <script src="//releases.flowplayer.org/7.2.4/flowplayer.min.js"></script>
+        <script src="//releases.flowplayer.org/hlsjs/flowplayer.hlsjs.min.js"></script>               
     </head>
     <body>
         <div class="header">
-            <h1>Learning JavaScript</h1>
-            <p>With Brad Traversy</p>
+            <h1>SledovaniTV.cz</h1>
+            <p>by Martin Silny</p>
         </div>
         
         <div class="container">            
-            <button id="btnLogin" onclick="login()">SledovaniTV.cz Login</button>
-            <button id="btnPlay" onclick="play()">play</button>
             <p id="response"></p>                                            
+        </div>                
+        
+        <div class="flowplayer fp-slim fp-edgy fp-outlined fp-custom-playlist" data-dvr="true" data-share="false" data-native_fullscreen="true" data-logo="">            
+             
+            <video>
+                <source data-title="SledovaniTV.cz" type="application/x-mpegurl" src='http://sledovanitv.cz/vlc/api-channel/ct1.m3u8?PHPSESSID=8q4t9gb8vvbqnn6om0rrjt1486&quality=20'>                                                               
+            </video>
+            <div class="fp-playlist">
+                <a href="http://sledovanitv.cz/vlc/api-channel/ct1.m3u8?PHPSESSID=8q4t9gb8vvbqnn6om0rrjt1486&quality=40">CT1</a>
+                <a href="http://sledovanitv.cz/vlc/api-channel/ct2.m3u8?PHPSESSID=8q4t9gb8vvbqnn6om0rrjt1486&quality=40">CT2</a>
+                <a href="http://sledovanitv.cz/vlc/api-channel/ctdecko.m3u8?PHPSESSID=8q4t9gb8vvbqnn6om0rrjt1486&quality=40">CTD</a>
+                <a href="http://sledovanitv.cz/vlc/api-channel/ct24.m3u8?PHPSESSID=8q4t9gb8vvbqnn6om0rrjt1486&quality=40">CT24</a>
+                <a href="http://sledovanitv.cz/vlc/api-channel/ct4sport.m3u8?PHPSESSID=8q4t9gb8vvbqnn6om0rrjt1486&quality=40">CT Sport</a>                                               
+            </div>
+            
+            <a class="fp-prev"></a>
+            <a class="fp-next"></a>
         </div>
 
-        <div class="containerVideo">
-            <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-            <video id="video" controls></video> 
-        </div>
+        <script>                                           
+            let apiURL = 'http://sledovanitv.cz/vlc/api-channel/';                                
+            let xhttp = new XMLHttpRequest();  
+            let sessionURL;             
 
-        <script>
-            let videoUrl;                   
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {                        
+                    response = JSON.parse(xhttp.responseText);
+                    document.getElementById("response").innerHTML = response.PHPSESSID;                                                                                                                                                            
+                }                
+            };
             
-            // {"status":1,"deviceId":1757911392,"password":"vgmbmjxkj2u1jffdnyfd"}            
-            var xhttp = new XMLHttpRequest();               
+            xhttp.open("GET", "https://sledovanitv.cz/api/device-login?deviceId=1757911392&password=vgmbmjxkj2u1jffdnyfd", true);                                                                                               
+            xhttp.send();                                                                             
             
-            function login(){                                
-                xhttp.onreadystatechange = function() {
-                    if (this.readyState == 4 && this.status == 200) {                        
-                        let response = JSON.parse(xhttp.responseText);
-                        document.getElementById("response").innerHTML = response.PHPSESSID;
-                        videoUrl = 'http://sledovanitv.cz/vlc/api-channel/Eurosport.m3u8?PHPSESSID='+ response.PHPSESSID +'&quality=40';   
-                        console.log(videoUrl);                     
-                    }
-                };
-                
-                xhttp.open("GET", "https://sledovanitv.cz/api/device-login?deviceId=1757911392&password=vgmbmjxkj2u1jffdnyfd", true);                                                                                               
-                xhttp.send();                                
-            }
-            
-            function play(){                                    
-                document.getElementById("response").innerHTML = videoUrl;
-                
-                if(Hls.isSupported())
-                {
-                    var video = document.getElementById('video');
-                    var hls = new Hls();
-                    hls.loadSource(videoUrl);
-                    hls.attachMedia(video);
-                    hls.on(Hls.Events.MANIFEST_PARSED,function()
-                    {
-                        video.play();
-                    });
-                }
-                else if (video.canPlayType('application/vnd.apple.mpegurl'))
-                {
-                    video.src = videoUrl;
-                    video.addEventListener('canplay',function()
-                    {
-                        video.play();
-                    });
-                }
-            }
-            
-            /*
-            // Button
-            function changeText(){
-                document.getElementById("btn").innerHTML='You clicked!!!';
-            }
-            
-            function doClick(){
-                alert('You clicked');
-            }
-            */
-            //-------------------------------------------------------------------
-            /*
-            // Object Arrays
-            let users = [
-                {
-                    name: 'John Doe',
-                    age: 35
-                },
-                {
-                    name: 'Mark Smith',
-                    age: 44
-                },
-                {
-                    name: 'Shelly Williams',
-                    age: 25
-                }
-            ];
+            flowplayer(function (api) {
+                api.on("load", function (e, api, video) {
+                $("#vinfo").text(api.engine.engineName + " engine playing " + video.type);
+                }); }); 
 
-            console.log(users);
-            */
-            //-------------------------------------------------------------------
-            /*
-            // Constructor pattern
-            function Fruit(name, color, shape){
-                this.name = name;
-                this.color = color;
-                this.shape = shape;
-                this.describe = function(){
-                    return 'A ' + this.name + ' color ' + this.color;
-                }
-            }
-
-            let apple = new Fruit('apple', 'red', 'round');
-            
-            console.log(apple.describe());
-            */
-            //-------------------------------------------------------------------
-            /*
-            // Object constructor 
-            let apple = new Object();
-            apple.color = 'red';
-            apple.shape = 'round';
-            apple.describe = function(){
-                return 'An apple ' + this.color + ' ' + this.shape;
-            }
-
-            console.log(apple.describe());
-            */
-            //-------------------------------------------------------------------
-            /*
-            // Object
-            var person = {
-                firstName:'Brad',
-                lastName:'Traversy',
-                age:34,
-                children:['Brianna', 'Nicholas'],
-                address: {
-                    street:'55 sds',
-                    city:'Boston',
-                    state:'MA'
-                },
-                fullName: function() {
-                    return this.firstName + ' ' + this.lastName;
-                }
-            }
-
-            console.log(person.fullName());
-            */
-            //-------------------------------------------------------------------
         </script>
     </body>
 </html>
